@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'register_screen.dart';
 import 'home_page.dart';
+import '../services/auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -60,13 +61,26 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 24),
                 ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
                     if (_formKey.currentState!.validate()) {
-                      // TODO: Implement login logic
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (context) => HomePage()),
-                      );
+                      try {
+                    
+                        // Llamada asincrónica para el login.
+                        final user = await AuthService().login(
+                          _usernameController.text,
+                          _passwordController.text,
+                        );
+                        // Aquí podrías almacenar el usuario/token en una variable de estado o en seguridad local.
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => HomePage()),
+                        );
+                      } catch (e) {
+                        // Mostrar mensaje de error, quizás con un SnackBar o AlertDialog.
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Error en el inicio de sesión: $e')),
+                        );
+                      }
                     }
                   },
                   child: Text('Iniciar Sesión'),

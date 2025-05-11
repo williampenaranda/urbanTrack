@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/user.dart';
+import '../services/auth_service.dart';
 
 class RegisterScreen extends StatefulWidget {
   @override
@@ -108,17 +109,27 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                 const SizedBox(height: 24),
                 ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
                     if (_formKey.currentState!.validate()) {
                       final user = User(
                         username: _usernameController.text,
                         password: _passwordController.text,
-                        firstName: _firstNameController.text,
-                        lastName: _lastNameController.text,
+                        first_name: _firstNameController.text,
+                        last_name: _lastNameController.text,
                         email: _emailController.text,
                       );
-                      // TODO: Implement registration logic
-                      Navigator.pop(context);
+
+                      try {
+                        final responseMessage = await AuthService().register(user);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(responseMessage)),
+                        );
+                        Navigator.pop(context);
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Error en el registro: $e')),
+                        );
+                      }
                     }
                   },
                   child: Text('Registrarse'),

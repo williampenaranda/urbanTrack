@@ -1,6 +1,6 @@
 from pydantic import BaseModel, EmailStr
-
-class UserRegister(BaseModel):
+#Se utilizo libreria pydantic para la gestion de los usuarios en la base de datos
+class UserRegister(BaseModel):      
     username: str
     password: str
     first_name: str

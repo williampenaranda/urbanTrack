@@ -6,10 +6,7 @@
             "name": "UrbanTrack",
             "request": "launch",
             "type": "dart",
-            "program": "lib/main.dart",
-            "args": [
-                "--no-sound-null-safety"
-            ]
+            "program": "FrontEnd/lib/main.dart",
         },
         {
             "name": "UrbanTrack (profile mode)",
