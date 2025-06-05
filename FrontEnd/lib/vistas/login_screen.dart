@@ -73,7 +73,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         // Aquí podrías almacenar el usuario/token en una variable de estado o en seguridad local.
                         Navigator.pushReplacement(
                           context,
-                          MaterialPageRoute(builder: (context) => HomePage()),
+                          MaterialPageRoute(builder: (context) => HomePage(user: user)),
                         );
                       } catch (e) {
                         // Mostrar mensaje de error, quizás con un SnackBar o AlertDialog.

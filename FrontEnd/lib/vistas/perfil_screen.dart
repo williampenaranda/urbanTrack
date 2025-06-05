@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import '../models/user.dart';
+import '../services/auth_service.dart';
 
 class PerfilScreen extends StatefulWidget {
-  const PerfilScreen({Key? key}) : super(key: key);
+  final User user;
+  const PerfilScreen({Key? key, required this.user}) : super(key: key);
 
   @override
   State<PerfilScreen> createState() => _PerfilScreenState();
@@ -14,15 +17,16 @@ class _PerfilScreenState extends State<PerfilScreen> {
   late TextEditingController _lastNameController;
   late TextEditingController _emailController;
   bool _isEditing = false;
+  late User _originalUser;
 
   @override
   void initState() {
     super.initState();
-    // TODO: Replace with actual user data from backend
-    _usernameController = TextEditingController(text: 'usuario123');
-    _firstNameController = TextEditingController(text: 'Juan');
-    _lastNameController = TextEditingController(text: 'Pérez');
-    _emailController = TextEditingController(text: 'juan.perez@email.com');
+    _originalUser = widget.user;
+    _usernameController = TextEditingController(text: _originalUser.username);
+    _firstNameController = TextEditingController(text: _originalUser.first_name);
+    _lastNameController = TextEditingController(text: _originalUser.last_name);
+    _emailController = TextEditingController(text: _originalUser.email);
   }
 
   @override
@@ -32,6 +36,55 @@ class _PerfilScreenState extends State<PerfilScreen> {
     _lastNameController.dispose();
     _emailController.dispose();
     super.dispose();
+  }
+
+  void _saveProfile() async {
+    if (_formKey.currentState!.validate()) {
+      // Actualiza el usuario con los nuevos datos
+      User updatedUser = User(
+        id: _originalUser.id,
+        username: _usernameController.text,
+        password: _originalUser.password, // password no cambia
+        first_name: _firstNameController.text,
+        last_name: _lastNameController.text,
+        email: _emailController.text,
+      );
+
+      // Enviar la solicitud al backend
+      try {
+        final responseMessage = await AuthService().updateUser(updatedUser);
+        final isError = responseMessage.startsWith('Error');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(responseMessage),
+            backgroundColor: isError ? Colors.red : Colors.green,
+          ),
+        );
+        if (!isError) {
+          setState(() {
+            _originalUser = updatedUser;
+            _isEditing = false;
+          });
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  void _restoreProfile() {
+    setState(() {
+      _usernameController.text = _originalUser.username;
+      _firstNameController.text = _originalUser.first_name;
+      _lastNameController.text = _originalUser.last_name;
+      _emailController.text = _originalUser.email;
+      _isEditing = false;
+    });
   }
 
   @override
@@ -89,110 +142,38 @@ class _PerfilScreenState extends State<PerfilScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    TextFormField(
-                      controller: _usernameController,
-                      decoration: const InputDecoration(
-                        labelText: 'Nombre de Usuario',
-                        prefixIcon: Icon(Icons.person_outline),
-                      ),
-                      enabled: _isEditing,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Por favor ingrese su nombre de usuario';
-                        }
-                        return null;
-                      },
-                    ),
+                    _buildTextField(_usernameController, 'Nombre de Usuario', Icons.person_outline),
                     const SizedBox(height: 16),
-                    TextFormField(
-                      controller: _firstNameController,
-                      decoration: const InputDecoration(
-                        labelText: 'Nombre',
-                        prefixIcon: Icon(Icons.badge),
-                      ),
-                      enabled: _isEditing,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Por favor ingrese su nombre';
-                        }
-                        return null;
-                      },
-                    ),
+                    _buildTextField(_firstNameController, 'Nombre', Icons.badge),
                     const SizedBox(height: 16),
-                    TextFormField(
-                      controller: _lastNameController,
-                      decoration: const InputDecoration(
-                        labelText: 'Apellido',
-                        prefixIcon: Icon(Icons.badge_outlined),
-                      ),
-                      enabled: _isEditing,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Por favor ingrese su apellido';
-                        }
-                        return null;
-                      },
-                    ),
+                    _buildTextField(_lastNameController, 'Apellido', Icons.badge_outlined),
                     const SizedBox(height: 16),
-                    TextFormField(
-                      controller: _emailController,
-                      decoration: const InputDecoration(
-                        labelText: 'Email',
-                        prefixIcon: Icon(Icons.email),
-                      ),
-                      enabled: _isEditing,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Por favor ingrese su email';
-                        }
-                        if (!value.contains('@')) {
-                          return 'Por favor ingrese un email válido';
-                        }
-                        return null;
-                      },
-                    ),
+                    _buildTextField(_emailController, 'Email', Icons.email),
                     const SizedBox(height: 24),
                     ElevatedButton(
                       onPressed: () {
                         if (_isEditing) {
-                          if (_formKey.currentState!.validate()) {
-                            // TODO: Implement update profile logic
-                            setState(() => _isEditing = false);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content:
-                                    Text('Perfil actualizado correctamente'),
-                                backgroundColor: Colors.green,
-                              ),
-                            );
-                          }
+                          _saveProfile();
                         } else {
                           setState(() => _isEditing = true);
                         }
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                            _isEditing ? Colors.green : Colors.indigo,
+                        backgroundColor: _isEditing ? Colors.green : Colors.indigo,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                       ),
-                      child: Text(
-                          _isEditing ? 'Guardar Cambios' : 'Editar Perfil'),
+                      child: Text(_isEditing ? 'Guardar Cambios' : 'Editar Perfil'),
                     ),
                     const SizedBox(height: 16),
                     if (_isEditing)
                       TextButton(
-                        onPressed: () {
-                          setState(() => _isEditing = false);
-                          // Restore previous values
-                          // TODO: Implement restore logic
-                        },
+                        onPressed: _restoreProfile,
                         child: const Text('Cancelar'),
                       ),
                     const SizedBox(height: 16),
                     OutlinedButton(
                       onPressed: () {
-                        // TODO: Implement logout logic
-                        Navigator.of(context).pushReplacementNamed('/login');
+                        Navigator.of(context).pushReplacementNamed('api/auth/login');
                       },
                       style: OutlinedButton.styleFrom(
                         foregroundColor: Colors.red,
@@ -208,6 +189,27 @@ class _PerfilScreenState extends State<PerfilScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildTextField(TextEditingController controller, String label, IconData icon) {
+    bool isEmail = label.toLowerCase() == 'email';
+    return TextFormField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: label,
+        prefixIcon: Icon(icon),
+      ),
+      enabled: _isEditing,
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Por favor ingrese su $label';
+        }
+        if (isEmail && !value.contains('@')) {
+          return 'Por favor ingrese un email válido';
+        }
+        return null;
+      },
     );
   }
 }

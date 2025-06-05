@@ -3,9 +3,11 @@ import 'package:geolocator/geolocator.dart';
 import 'map_screen.dart';
 import 'rutas_screen.dart';
 import 'perfil_screen.dart';
+import '../models/user.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+  final User user; // Agregado
+  const HomePage({Key? key, required this.user}) : super(key: key);
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -16,11 +18,17 @@ class _HomePageState extends State<HomePage> {
   final TextEditingController _locationController = TextEditingController();
   final PageController _pageController = PageController();
 
-  final _screens = [
-    MapScreen(),
-    RutasScreen(),
-    PerfilScreen(),
-  ];
+  late List<Widget> _screens; // 👈 Cambiado
+
+  @override
+  void initState() {
+    super.initState();
+    _screens = [
+      MapScreen(),
+      RutasScreen(),
+      PerfilScreen(user: widget.user), // 👈 Ahora sí funciona
+    ];
+  }
 
   // Lista de ejemplo de buses
   final List<Map<String, dynamic>> _proximosBuses = [
@@ -243,7 +251,7 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
           RutasScreen(),
-          PerfilScreen(),
+          PerfilScreen(user: widget.user,),
         ],
       ),
       floatingActionButton: _selectedIndex == 0

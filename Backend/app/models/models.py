@@ -10,3 +10,9 @@ class UserRegister(BaseModel):
 class UserLogin(BaseModel):
     username: str
     password: str
+    
+class UserUpdate(BaseModel):
+    username: str
+    first_name: str
+    last_name: str
+    email: EmailStr
