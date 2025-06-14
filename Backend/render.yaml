@@ -1,0 +1,13 @@
+services:
+
+type: web
+name: urbantrack-api
+env: python
+region: oregon
+plan: free
+buildCommand: pip install -r requirements.txt
+startCommand: uvicorn app.main:app --host 0.0.0.0 --port 10000
+envVars:
+
+key: DATABASE_URL
+value: postgresql://william:0wJDjlydvcaj1VTEasiQZMks6701lUbt@dpg-d15k25nfte5s739a7bdg-a.oregon-postgres.render.com/urbantrack

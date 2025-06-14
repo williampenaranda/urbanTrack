@@ -1,68 +1,63 @@
-from fastapi import APIRouter, HTTPException
+# app/auth/routes.py
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
 from app.models.models import UserRegister, UserLogin, UserUpdate
-from app.database import get_db_connection
+from app.models.entities import Usuario
+from app.database import get_db
 from app.auth.utils import hash_password, verify_password
 
 router = APIRouter()
 
 @router.post("/register")
-def register(user: UserRegister): #Se conecta con la base de datos e ingresa los datos de registro
-    conn = get_db_connection()
-    cursor = conn.cursor()
+def register(user: UserRegister, db: Session = Depends(get_db)):
     try:
-        cursor.execute(
-            "INSERT INTO usuario (username, password, first_name, last_name, email) VALUES (?, ?, ?, ?, ?)",
-            (user.username, hash_password(user.password), user.first_name, user.last_name, user.email),
-        )
-        conn.commit()
-    except Exception as e:
-        print("Error al registrar el usuario:", str(e))  # Log del error
-        raise HTTPException(status_code=400, detail="Error al registrar el usuario")
-    finally:
-        conn.close()
-    return {"message": "Usuario registrado exitosamente"}
+        existing_user = db.query(Usuario).filter(Usuario.username == user.username).first()
+        if existing_user:
+            raise HTTPException(status_code=400, detail="El usuario ya existe")
 
-@router.post("/login")  #Se conecta con la base de datos para comparar predenciales
-def login(data: UserLogin):
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM usuario WHERE username = ?", (data.username,))
-    user = cursor.fetchone()
-    conn.close()
+        new_user = Usuario(
+            username=user.username,
+            password=hash_password(user.password),
+            first_name=user.first_name,
+            last_name=user.last_name,
+            email=user.email
+        )
+        db.add(new_user)
+        db.commit()
+        db.refresh(new_user)
+        return {"message": "Usuario registrado exitosamente"}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail="Error al registrar el usuario")
+
+@router.post("/login")
+def login(data: UserLogin, db: Session = Depends(get_db)):
+    user = db.query(Usuario).filter(Usuario.username == data.username).first()
     print("Se recibió una solicitud de login:", data.username)
-    if not user or not verify_password(data.password, user["password"]):
+    if not user or not verify_password(data.password, user.password):
         raise HTTPException(status_code=401, detail="Credenciales inválidas")
     return {
         "user": {
-            "id": user["id"],
-            "username": user["username"],
-            "first_name": user["first_name"],
-            "last_name": user["last_name"],
-            "email": user["email"],
+            "id": user.id,
+            "username": user.username,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "email": user.email,
         }
     }
 
 @router.put("/users/{user_id}")
-def update_user(user_id: int, updated_user: UserUpdate):
-    conn = get_db_connection()
-    cursor = conn.cursor()
+def update_user(user_id: int, updated_user: UserUpdate, db: Session = Depends(get_db)):
+    user = db.query(Usuario).filter(Usuario.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
     try:
-        cursor.execute(
-            "UPDATE usuario SET username = ?, first_name = ?, last_name = ?, email = ? WHERE id = ?",
-            (
-                updated_user.username,
-                updated_user.first_name,
-                updated_user.last_name,
-                updated_user.email,
-                user_id,
-            ),
-        )
-        conn.commit()
-        if cursor.rowcount == 0:
-            raise HTTPException(status_code=404, detail="Usuario no encontrado")
+        user.username = updated_user.username
+        user.first_name = updated_user.first_name
+        user.last_name = updated_user.last_name
+        user.email = updated_user.email
+
+        db.commit()
+        return {"message": "Perfil actualizado exitosamente"}
     except Exception as e:
-        print("Error al actualizar usuario:", e)
-        raise HTTPException(status_code=400, detail="Error al actualizar usuario")
-    finally:
-        conn.close()
-    return {"message": "Perfil actualizado exitosamente"}
+        raise HTTPException(status_code=400, detail="Error al actualizar el perfil")
+

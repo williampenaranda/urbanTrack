@@ -1,0 +1,1724 @@
+{
+  "type": "FeatureCollection",
+  "generator": "overpass-turbo",
+  "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL.",
+  "timestamp": "2025-06-07T19:20:01Z",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/838206485",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "public_transport": "platform"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.5299095,
+          10.4130486
+        ]
+      },
+      "id": "node/838206485"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/891268909",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Parque María Mulata-Cl.15",
+        "public_transport": "platform"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.5501331,
+          10.4141609
+        ]
+      },
+      "id": "node/891268909"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/892055018",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Hospital Naval",
+        "public_transport": "platform"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.5508144,
+          10.4159034
+        ]
+      },
+      "id": "node/892055018"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/898552127",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "public_transport": "platform",
+        "shelter": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.5055388,
+          10.4034291
+        ]
+      },
+      "id": "node/898552127"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1102091390",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "public_transport": "platform"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.5303851,
+          10.4134677
+        ]
+      },
+      "id": "node/1102091390"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1156427607",
+        "bench": "no",
+        "bin": "no",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "public_transport": "platform",
+        "shelter": "no",
+        "tactile_paving": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.5325028,
+          10.4151704
+        ]
+      },
+      "id": "node/1156427607"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1156427609",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "public_transport": "platform"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.5357513,
+          10.4187067
+        ]
+      },
+      "id": "node/1156427609"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1156427614",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "public_transport": "platform"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.5336481,
+          10.4163267
+        ]
+      },
+      "id": "node/1156427614"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1156427623",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "public_transport": "platform"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.5313486,
+          10.4143106
+        ]
+      },
+      "id": "node/1156427623"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1156427627",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "public_transport": "platform"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.5347212,
+          10.4175416
+        ]
+      },
+      "id": "node/1156427627"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2223103606",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "public_transport": "platform",
+        "source": "bing"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.5518329,
+          10.4169413
+        ]
+      },
+      "id": "node/2223103606"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2223103612",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "public_transport": "platform",
+        "source": "bing"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.5537668,
+          10.4217343
+        ]
+      },
+      "id": "node/2223103612"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2223103616",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "public_transport": "platform",
+        "shelter": "yes",
+        "source": "bing"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.5543163,
+          10.423223
+        ]
+      },
+      "id": "node/2223103616"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2223103620",
+        "bench": "yes",
+        "bin": "no",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "public_transport": "platform",
+        "shelter": "yes",
+        "source": "bing"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.5543523,
+          10.4233084
+        ]
+      },
+      "id": "node/2223103620"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2223103622",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "public_transport": "platform",
+        "source": "bing"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.5497015,
+          10.4285763
+        ]
+      },
+      "id": "node/2223103622"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2223103626",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "public_transport": "platform",
+        "source": "bing"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.5492286,
+          10.4286253
+        ]
+      },
+      "id": "node/2223103626"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2223103631",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "public_transport": "platform",
+        "source": "bing"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.5495565,
+          10.4286907
+        ]
+      },
+      "id": "node/2223103631"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2223103634",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "public_transport": "platform",
+        "source": "bing"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.5494226,
+          10.4287916
+        ]
+      },
+      "id": "node/2223103634"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2223103639",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "public_transport": "platform",
+        "source": "bing"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.548693,
+          10.4292975
+        ]
+      },
+      "id": "node/2223103639"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2223103645",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "public_transport": "platform",
+        "source": "bing"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.5486043,
+          10.4293674
+        ]
+      },
+      "id": "node/2223103645"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2223103649",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "public_transport": "platform",
+        "source": "bing"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.5484843,
+          10.4294528
+        ]
+      },
+      "id": "node/2223103649"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2223103654",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "public_transport": "platform",
+        "source": "bing"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.5473502,
+          10.4303401
+        ]
+      },
+      "id": "node/2223103654"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2223103670",
+        "bench": "yes",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "public_transport": "platform",
+        "shelter": "yes",
+        "source": "bing"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.5336314,
+          10.437042
+        ]
+      },
+      "id": "node/2223103670"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2223103676",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Terrazas de San Sebastian - parada de Transcribe",
+        "public_transport": "platform",
+        "source": "bing"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.5316431,
+          10.4386514
+        ]
+      },
+      "id": "node/2223103676"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2223103690",
+        "bench": "yes",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "public_transport": "platform",
+        "shelter": "yes",
+        "source": "bing"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.5303419,
+          10.4392418
+        ]
+      },
+      "id": "node/2223103690"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2223103693",
+        "highway": "bus_stop",
+        "source": "bing"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.5290998,
+          10.440387
+        ]
+      },
+      "id": "node/2223103693"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2223103697",
+        "highway": "bus_stop",
+        "source": "bing"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.5289455,
+          10.4404888
+        ]
+      },
+      "id": "node/2223103697"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2223103701",
+        "highway": "bus_stop",
+        "source": "bing"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.5287904,
+          10.4405923
+        ]
+      },
+      "id": "node/2223103701"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2223123733",
+        "bench": "yes",
+        "bin": "no",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "public_transport": "platform",
+        "shelter": "yes",
+        "source": "bing"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.5515263,
+          10.4059535
+        ]
+      },
+      "id": "node/2223123733"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3887891251",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "CitySightseeing Cartagena",
+        "public_transport": "platform"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.5508261,
+          10.3954026
+        ]
+      },
+      "id": "node/3887891251"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4626901291",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Bus para Pasacaballos",
+        "public_transport": "platform"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.544528,
+          10.4272041
+        ]
+      },
+      "id": "node/4626901291"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4961882628",
+        "highway": "bus_stop"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.4450946,
+          10.4110082
+        ]
+      },
+      "id": "node/4961882628"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4961882629",
+        "highway": "bus_stop"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.4599741,
+          10.4024993
+        ]
+      },
+      "id": "node/4961882629"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4961883128",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Villas de la Candelaria",
+        "network": "TransCaribe",
+        "public_transport": "platform",
+        "shelter": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.4618838,
+          10.4019912
+        ]
+      },
+      "id": "node/4961883128"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4961883144",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "public_transport": "platform"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.5048175,
+          10.3881161
+        ]
+      },
+      "id": "node/4961883144"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4961883145",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "operator": "TransCaribe",
+        "public_transport": "platform"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.5075909,
+          10.3876882
+        ]
+      },
+      "id": "node/4961883145"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4964789922",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name:en": "Shuttle bus to Playa Blanca (book at Mamallena Hostel)",
+        "public_transport": "platform"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.5444019,
+          10.4224873
+        ]
+      },
+      "id": "node/4964789922"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5009870523",
+        "bench": "yes",
+        "bin": "yes",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "public_transport": "platform",
+        "shelter": "yes",
+        "tactile_paving": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.5515856,
+          10.4271144
+        ]
+      },
+      "id": "node/5009870523"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5067529822",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name:en": "Bus to Bus Terminal",
+        "public_transport": "platform"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.5412207,
+          10.4218926
+        ]
+      },
+      "id": "node/5067529822"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5305141521",
+        "bench": "yes",
+        "bin": "yes",
+        "highway": "bus_stop",
+        "shelter": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.5232479,
+          10.4425536
+        ]
+      },
+      "id": "node/5305141521"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5357684739",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "BUS.T103",
+        "public_transport": "platform"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.5503361,
+          10.4147869
+        ]
+      },
+      "id": "node/5357684739"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5357684932",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "public_transport": "platform"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.553554,
+          10.4221606
+        ]
+      },
+      "id": "node/5357684932"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5357685428",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "public_transport": "platform"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.5624598,
+          10.3978684
+        ]
+      },
+      "id": "node/5357685428"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5529407622",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Parada a Pasacaballos",
+        "name:en": "Bus to Pasacaballos",
+        "public_transport": "platform"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.53945,
+          10.4255363
+        ]
+      },
+      "id": "node/5529407622"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5912359788",
+        "bench": "yes",
+        "bin": "yes",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "BUS.T103",
+        "public_transport": "platform",
+        "shelter": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.550465,
+          10.4104491
+        ]
+      },
+      "id": "node/5912359788"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5912359886",
+        "bench": "yes",
+        "bin": "yes",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "BUS.T103",
+        "public_transport": "platform",
+        "shelter": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.5506436,
+          10.4104596
+        ]
+      },
+      "id": "node/5912359886"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6336917085",
+        "bench": "yes",
+        "bin": "no",
+        "highway": "bus_stop",
+        "name:en": "T 102 Bus Stop",
+        "shelter": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.5252521,
+          10.4428827
+        ]
+      },
+      "id": "node/6336917085"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6389595014",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "public_transport": "platform"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.5174826,
+          10.4474741
+        ]
+      },
+      "id": "node/6389595014"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6389595896",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "public_transport": "platform"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.5174012,
+          10.447321
+        ]
+      },
+      "id": "node/6389595896"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6541330685",
+        "highway": "bus_stop",
+        "name": "Taxi colectivo al centro 2200COP",
+        "name:en": "Colectivo to the centre 2200COP",
+        "name:fr": "Taxi colectivo pour le centre 2200COP"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.5153316,
+          10.4518807
+        ]
+      },
+      "id": "node/6541330685"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7125319373",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "public_transport": "platform"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.5192875,
+          10.4018781
+        ]
+      },
+      "id": "node/7125319373"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7125328999",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "public_transport": "platform"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.520548,
+          10.4054651
+        ]
+      },
+      "id": "node/7125328999"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7127192917",
+        "description": "Not confirmed If it's possible to embarque",
+        "highway": "bus_stop",
+        "name": "Bus a Playa Blanco?"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.4977629,
+          10.3032602
+        ]
+      },
+      "id": "node/7127192917"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7278506485",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "moto-taxi to terminal de transporte",
+        "public_transport": "platform"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.5446273,
+          10.4263258
+        ]
+      },
+      "id": "node/7278506485"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/9951683259",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "A105",
+        "public_transport": "platform"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.4816197,
+          10.379757
+        ]
+      },
+      "id": "node/9951683259"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/9951701812",
+        "bench": "yes",
+        "bin": "no",
+        "bus": "yes",
+        "description": "A102\nX106",
+        "highway": "bus_stop",
+        "lit": "no",
+        "name": "La princesa",
+        "public_transport": "platform",
+        "ref:signed": "no",
+        "shelter": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.4646084,
+          10.3811843
+        ]
+      },
+      "id": "node/9951701812"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10572562210",
+        "highway": "bus_stop",
+        "name": "Transcribe",
+        "name:en": "\"Glorimar Store\" Transcribe Stop",
+        "name:es": "Parada de Transcribe \"Tienda Glorimar\""
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.517212,
+          10.4492323
+        ]
+      },
+      "id": "node/10572562210"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10920301905",
+        "bench": "yes",
+        "highway": "bus_stop",
+        "shelter": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.5176588,
+          10.4445524
+        ]
+      },
+      "id": "node/10920301905"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11159488227",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "public_transport": "platform",
+        "shelter": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.5055126,
+          10.4035081
+        ]
+      },
+      "id": "node/11159488227"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11218814647",
+        "bus": "yes",
+        "departures_board": "yes",
+        "highway": "bus_stop",
+        "name": "A107 - Blase de Lezo / Santa Lucía",
+        "operator": "Transcaribe",
+        "public_transport": "platform",
+        "ref": "7",
+        "shelter": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.4859004,
+          10.3849473
+        ]
+      },
+      "id": "node/11218814647"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11219143631",
+        "bus": "yes",
+        "departures_board": "yes",
+        "highway": "bus_stop",
+        "name": "A107 - Blase de Lezo / Santa Lucía",
+        "operator": "Transcaribe",
+        "public_transport": "platform",
+        "ref": "8"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.486454,
+          10.3832607
+        ]
+      },
+      "id": "node/11219143631"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11219143632",
+        "bus": "yes",
+        "departures_board": "yes",
+        "highway": "bus_stop",
+        "name": "A107 - Blase de Lezo / Santa Lucía",
+        "operator": "Transcaribe",
+        "public_transport": "platform",
+        "ref": "35"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.4862873,
+          10.3832304
+        ]
+      },
+      "id": "node/11219143632"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11327594232",
+        "bus": "yes",
+        "departures_board": "yes",
+        "highway": "bus_stop",
+        "name": "A104 | A105",
+        "network": "Transcaribe",
+        "operator": "Transcaribe",
+        "public_transport": "platform",
+        "ref": "3 | 3"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.4814168,
+          10.3887336
+        ]
+      },
+      "id": "node/11327594232"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11639266569",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "public_transport": "platform"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.5407602,
+          10.4340374
+        ]
+      },
+      "id": "node/11639266569"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11639266669",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "public_transport": "platform"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.5430509,
+          10.4328831
+        ]
+      },
+      "id": "node/11639266669"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11753733979",
+        "bus": "yes",
+        "departures_board": "yes",
+        "highway": "bus_stop",
+        "name": "X102",
+        "operator": "Transcaribe",
+        "public_transport": "platform",
+        "ref": "38"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.502027,
+          10.3884127
+        ]
+      },
+      "id": "node/11753733979"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11762212699",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "X102: Portal / Bosque / Centro",
+        "operator": "Transcaribe",
+        "public_transport": "platform",
+        "ref": "39"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.4998093,
+          10.3887949
+        ]
+      },
+      "id": "node/11762212699"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12042756474",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "network": "X106",
+        "operator": "Transcaribe",
+        "public_transport": "platform"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.468771,
+          10.3842521
+        ]
+      },
+      "id": "node/12042756474"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12059944269",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "T102 para Chambacú",
+        "name:en": "T102 to Chambacú station",
+        "public_transport": "platform"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.5178701,
+          10.4435967
+        ]
+      },
+      "id": "node/12059944269"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12059944369",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "X104 para",
+        "name:en": "X104 to the bus terminal",
+        "name:es": "X104 para Terminal de Transporte",
+        "public_transport": "platform"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.5466339,
+          10.4250282
+        ]
+      },
+      "id": "node/12059944369"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12059944569",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "X104 para Centro/ Terminal de Transporte",
+        "name:en": "X104 to Centro/ to the bus terminal",
+        "public_transport": "platform"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.5405296,
+          10.4259039
+        ]
+      },
+      "id": "node/12059944569"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12092721013",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "network": "TransCaribe",
+        "public_transport": "platform",
+        "shelter": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.4849884,
+          10.3923604
+        ]
+      },
+      "id": "node/12092721013"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12092721014",
+        "bench": "yes",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "network": "TransCaribe",
+        "public_transport": "platform",
+        "shelter": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.4889653,
+          10.3909351
+        ]
+      },
+      "id": "node/12092721014"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12115589561",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "La Bodeguita",
+        "network": "Transcaribe",
+        "note": "Parada de autobús para las rutas complementarias de Transcaribe frente al parque de la marina.",
+        "operator": "Transcaribe S.A.",
+        "public_transport": "platform",
+        "shelter": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.5509983,
+          10.4205079
+        ]
+      },
+      "id": "node/12115589561"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12125327573",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "network": "TransCaribe",
+        "public_transport": "platform"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.5022539,
+          10.3886194
+        ]
+      },
+      "id": "node/12125327573"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12125327574",
+        "bench": "yes",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "network": "TransCaribe",
+        "public_transport": "platform",
+        "shelter": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.499956,
+          10.3889805
+        ]
+      },
+      "id": "node/12125327574"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12125327575",
+        "bench": "yes",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "network": "TransCaribe",
+        "public_transport": "platform",
+        "shelter": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.4975215,
+          10.3893838
+        ]
+      },
+      "id": "node/12125327575"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12125327576",
+        "bench": "yes",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "network": "TransCaribe",
+        "public_transport": "platform",
+        "shelter": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.4959582,
+          10.3896515
+        ]
+      },
+      "id": "node/12125327576"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12125327577",
+        "bench": "yes",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "network": "TransCaribe",
+        "public_transport": "platform",
+        "shelter": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.4940197,
+          10.3899728
+        ]
+      },
+      "id": "node/12125327577"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12125327578",
+        "bench": "yes",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "network": "TransCaribe",
+        "public_transport": "platform",
+        "shelter": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.4919813,
+          10.3903264
+        ]
+      },
+      "id": "node/12125327578"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12125327579",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "public_transport": "platform",
+        "shelter": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.4906807,
+          10.3906457
+        ]
+      },
+      "id": "node/12125327579"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12135927727",
+        "bench": "yes",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "network": "TransCaribe",
+        "public_transport": "platform",
+        "shelter": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.4867902,
+          10.3918251
+        ]
+      },
+      "id": "node/12135927727"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12135930533",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "network": "TransCaribe",
+        "public_transport": "platform",
+        "shelter": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.4975555,
+          10.389162
+        ]
+      },
+      "id": "node/12135930533"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12135936059",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "network": "TransCaribe",
+        "public_transport": "platform",
+        "shelter": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.4959165,
+          10.3894366
+        ]
+      },
+      "id": "node/12135936059"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12135936062",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "operator": "TransCaribe",
+        "public_transport": "platform",
+        "shelter": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.4939833,
+          10.3897565
+        ]
+      },
+      "id": "node/12135936062"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12135936063",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "operator": "TransCaribe",
+        "public_transport": "platform",
+        "shelter": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.4913987,
+          10.3902099
+        ]
+      },
+      "id": "node/12135936063"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12135936064",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "operator": "TransCaribe",
+        "public_transport": "platform",
+        "shelter": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.4888663,
+          10.3907521
+        ]
+      },
+      "id": "node/12135936064"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12135936065",
+        "bench": "yes",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "network": "TransCaribe",
+        "public_transport": "platform",
+        "shelter": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.4851692,
+          10.3924886
+        ]
+      },
+      "id": "node/12135936065"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12319662369",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "La Plazuela",
+        "network": "TracsCaribe",
+        "public_transport": "platform",
+        "shelter": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.478567,
+          10.3904335
+        ]
+      },
+      "id": "node/12319662369"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12319713039",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Cementerio",
+        "network": "TransCaribe",
+        "public_transport": "platform"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.4741242,
+          10.3876635
+        ]
+      },
+      "id": "node/12319713039"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12351738587",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "network": "TransCaribe",
+        "public_transport": "platform",
+        "shelter": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.4640906,
+          10.4015388
+        ]
+      },
+      "id": "node/12351738587"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12813209424",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "network": "Transcaribe",
+        "public_transport": "platform",
+        "shelter": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.4589608,
+          10.4009763
+        ]
+      },
+      "id": "node/12813209424"
+    }
+  ]
+}
