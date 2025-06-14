@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from app.database import get_db_connection
+from app.database import get_db
 from app.models.entities import RutaUsuario, Ubicacion, UbicacionTemporal
 from app.services.bus_tracking import calcular_buses
 from datetime import datetime
@@ -8,7 +8,7 @@ from datetime import datetime
 router = APIRouter()
 
 @router.post("/update_location")
-def update_location(user_id: int, ruta_id: int, latitude: float, longitude: float, db: Session = Depends(get_db_connection)):
+def update_location(user_id: int, ruta_id: int, latitude: float, longitude: float, db: Session = Depends(get_db)):
     """
     Guarda la ubicación del usuario en la base de datos y actualiza el estado de abordo.
     """
@@ -30,7 +30,7 @@ def update_location(user_id: int, ruta_id: int, latitude: float, longitude: floa
     return {"message": "Ubicación actualizada correctamente"}
 
 @router.get("/get_buses/{ruta_id}")
-def obtener_buses(ruta_id: int, db: Session = Depends(get_db_connection)):
+def obtener_buses(ruta_id: int, db: Session = Depends(get_db)):
     """
     Devuelve los buses virtuales en la ruta especificada.
     """
@@ -38,7 +38,7 @@ def obtener_buses(ruta_id: int, db: Session = Depends(get_db_connection)):
     return buses
 
 @router.post("/check_exit")
-def verificar_bajada(user_id: int, ruta_id: int, latitude: float, longitude: float, db: Session = Depends(get_db_connection)):
+def verificar_bajada(user_id: int, ruta_id: int, latitude: float, longitude: float, db: Session = Depends(get_db)):
     """
     Verifica si el usuario se ha alejado del grupo y lo marca como 'fuera del bus'.
     """
