@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import '../models/user.dart';
 
 class AuthService {
-  static const String baseUrl = 'http://172.16.21.91:8000'; // Cambia IP
+  static const String baseUrl ='http://192.168.1.6:8000'; // Cambia IP o utilizar URL del servidor cuando este desplegado
 
   Future<User> login(String username, String password) async {
     final url = Uri.parse('$baseUrl/api/auth/login');
