@@ -191,32 +191,3 @@ def calculate_user_route(request: CalculateRouteRequest, db: Session = Depends(g
             detail=f"Error interno al calcular la ruta: {e}"
         )
 
-@router.post("/calculate_route", status_code=status.HTTP_200_OK, response_model=CalculateRouteResponse) # <--- Asegúrate de que response_model esté actualizado
-def calculate_user_route(request: CalculateRouteRequest, db: Session = Depends(get_db)):
-    """
-    Calcula el trayecto más adecuado para el usuario entre dos puntos geográficos.
-    """
-    try:
-        # calcular_trayecto_usuario ya devuelve el formato que necesitamos para CalculateRouteResponse
-        suggested_route_data = calcular_trayecto_usuario(
-            db,
-            request.origen_lat,
-            request.origen_lon,
-            request.destino_lat,
-            request.destino_lon
-        )
-        # La función ya devuelve un diccionario que coincide con CalculateRouteResponse
-        # No necesitamos Raise HTTPException aquí si el servicio ya maneja los mensajes de no encontrado.
-        # Solo lo hacemos si el servicio devuelve None para un error inesperado
-        if suggested_route_data is None:
-             raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="El servicio de cálculo de ruta devolvió un resultado nulo."
-            )
-        return suggested_route_data
-    except Exception as e:
-        print(f"Error al calcular la ruta: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error interno al calcular la ruta: {e}"
-        )
