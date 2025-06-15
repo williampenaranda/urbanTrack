@@ -22,7 +22,7 @@ class UserRegister(BaseModel):
 # Esquema para el inicio de sesión de usuarios
 class UserLogin(BaseModel):
     username: str
-    password: str
+    password: str   
 
 # Esquema para la actualización de datos de usuario (sin password aquí)
 class UserUpdate(BaseModel):
@@ -183,3 +183,19 @@ class CalculateRouteResponse(BaseModel): # Tu esquema de respuesta final para /c
     rutas_alternativas_origen: Optional[List[RutaBasicResponse]] = None # Adaptado para usar RutaBasicResponse
     parada_origen_sugerida: Optional[ParadaSugeridaResponse] = None
     parada_destino_sugerida: Optional[ParadaSugeridaResponse] = None
+
+class UbicacionResponse(BaseModel):
+    latitude: float
+    longitude: float
+
+class ParadaEnRutaResponse(BaseModel):
+    id: int
+    nombre: str
+    codigo: Optional[str] = None
+    ubicacion: Optional[UbicacionResponse] = None
+    orden_en_ruta: int
+
+class RutaDetalleResponse(BaseModel):
+    id: int
+    nombre: str
+    paradas: List[ParadaEnRutaResponse]

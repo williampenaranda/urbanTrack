@@ -1,14 +1,17 @@
-# app/rutas/bus_routes.py
-
 from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models.entities import RutaUsuario, UbicacionUsuario, UbicacionTemporal, Ruta, UsuarioRutaActual, Parada
 from app.services.bus_tracking import _get_or_create_ubicacion_usuario, check_user_location_status, run_bus_tracking_periodically
 from app.services.route_calculation import calcular_trayecto_usuario
-from datetime import datetime
 
-# --- ¡NUEVA IMPORTACIÓN DE ESQUEMAS! ---
+# --- NUEVA IMPORTACIÓN PARA INFORMACIÓN DE RUTAS ---
+from app.services import route_info_service 
+
+from datetime import datetime
+from typing import List, Dict, Optional
+
+# --- ¡NUEVAS IMPORTACIONES DE ESQUEMAS! ---
 from app.models.models import (
     UserLocationUpdate,
     CheckExitRequest,
@@ -16,10 +19,19 @@ from app.models.models import (
     SetNextStopRequest,
     CalculateRouteRequest,
     BusLocationResponse, # Si decides usarla como response_model
-    CalculateRouteResponse # Si decides usarla como response_model
+    CalculateRouteResponse, # Si decides usarla como response_model
+    
+    # --- Nuevos modelos para las respuestas de rutas ---
+    UbicacionResponse, # Modelo para latitud/longitud
+    ParadaEnRutaResponse, # Modelo para detalles de parada en ruta
+    RutaDetalleResponse # Modelo para detalles completos de una ruta
 )
 
-router = APIRouter()
+router = APIRouter(
+    prefix="/api/bus", # Añadimos un prefijo base para todos los endpoints de bus
+    tags=["Bus Routes & Tracking"] # Etiqueta para agrupar en la documentación de Swagger
+)
+
 # --- Configuración para la tarea de fondo de cálculo de buses (Recordatorio) ---
 # Este bloque no va en este archivo, sino en tu `main.py` de FastAPI.
 # Es un recordatorio de cómo iniciar el hilo para `run_bus_tracking_periodically`.
@@ -71,7 +83,6 @@ def update_location(data: UserLocationUpdate, db: Session = Depends(get_db)):
     return {"message": "Ubicación actualizada correctamente y estado verificado.", "status": status_info}
 
 
-
 @router.get("/get_buses/{ruta_id}", status_code=status.HTTP_200_OK)
 def obtener_buses(ruta_id: int, db: Session = Depends(get_db)):
     """
@@ -93,7 +104,6 @@ def obtener_buses(ruta_id: int, db: Session = Depends(get_db)):
     return buses_data
 
 
-
 @router.post("/check_exit", status_code=status.HTTP_200_OK)
 def verificar_bajada_endpoint(data: CheckExitRequest, db: Session = Depends(get_db)):
     """
@@ -101,7 +111,6 @@ def verificar_bajada_endpoint(data: CheckExitRequest, db: Session = Depends(get_
     """
     status_info = check_user_location_status(db, data.user_id, data.latitude, data.longitude)
     return status_info
-
 
 
 @router.post("/select_route", status_code=status.HTTP_200_OK)
@@ -118,7 +127,6 @@ def select_route_for_user(request: SelectRouteRequest, db: Session = Depends(get
     db.commit()
     db.refresh(user_route) 
     return {"message": f"Ruta {request.ruta_id} seleccionada para el usuario {request.user_id}"}
-
 
 
 @router.post("/set_next_stop", status_code=status.HTTP_200_OK)
@@ -138,22 +146,22 @@ def set_next_stop_for_user(request: SetNextStopRequest, db: Session = Depends(ge
     # --- Lógica de verificación de parada en ruta (deshabilitada por ahora) ---
     # Esto se puede habilitar una vez que la lógica de cálculo de ruta esté lista.
     # if not user_route_info.ruta_seleccionada_id:
-    #     raise HTTPException(
-    #         status_code=status.HTTP_400_BAD_REQUEST,
-    #         detail="El usuario no tiene una ruta seleccionada. Seleccione una ruta antes de establecer una parada."
-    #     )
+    #    raise HTTPException(
+    #        status_code=status.HTTP_400_BAD_REQUEST,
+    #        detail="El usuario no tiene una ruta seleccionada. Seleccione una ruta antes de establecer una parada."
+    #    )
     #
     # from app.models.entities import RutaParada # Necesitarías importar RutaParada aquí si no está arriba
     # parada_en_ruta = db.query(RutaParada).filter(
-    #     RutaParada.ruta_id == user_route_info.ruta_seleccionada_id, 
-    #     RutaParada.parada_id == request.parada_id
+    #    RutaParada.ruta_id == user_route_info.ruta_seleccionada_id, 
+    #    RutaParada.parada_id == request.parada_id
     # ).first()
     #
     # if not parada_en_ruta:
-    #     raise HTTPException(
-    #         status_code=status.HTTP_400_BAD_REQUEST,
-    #         detail="La parada seleccionada no pertenece a la ruta activa del usuario."
-    #     )
+    #    raise HTTPException(
+    #        status_code=status.HTTP_400_BAD_REQUEST,
+    #        detail="La parada seleccionada no pertenece a la ruta activa del usuario."
+    #    )
     # --- FIN Lógica de verificación ---
 
     user_route_info.proxima_parada_id = request.parada_id
@@ -161,8 +169,8 @@ def set_next_stop_for_user(request: SetNextStopRequest, db: Session = Depends(ge
     db.refresh(user_route_info)
     return {"message": f"Próxima parada {request.parada_id} establecida para el usuario {request.user_id}"}
 
-# --- NUEVO ENDPOINT para calcular la ruta ---
-@router.post("/calculate_route", status_code=status.HTTP_200_OK)
+# --- ENDPOINT para calcular la ruta ---
+@router.post("/rutas/calculate_route", status_code=status.HTTP_200_OK, response_model=CalculateRouteResponse)
 def calculate_user_route(request: CalculateRouteRequest, db: Session = Depends(get_db)):
     """
     Calcula el trayecto más adecuado para el usuario entre dos puntos geográficos.
@@ -175,9 +183,7 @@ def calculate_user_route(request: CalculateRouteRequest, db: Session = Depends(g
             request.destino_lat,
             request.destino_lon
         )
-        if suggested_route and suggested_route.get("ruta_sugerida"):
-            return suggested_route
-        elif suggested_route: # Si hay mensaje pero no ruta sugerida directa (ej. rutas alternativas)
+        if suggested_route:
             return suggested_route
         else:
             raise HTTPException(
@@ -191,3 +197,26 @@ def calculate_user_route(request: CalculateRouteRequest, db: Session = Depends(g
             detail=f"Error interno al calcular la ruta: {e}"
         )
 
+
+# --- NUEVOS ENDPOINTS PARA INFORMACIÓN DE RUTAS ---
+
+@router.get("/rutas", response_model=List[RutaDetalleResponse])
+def get_all_transcaribe_routes(db: Session = Depends(get_db)):
+    """
+    Obtiene una lista de todas las rutas de Transcaribe con sus detalles, incluyendo las paradas.
+    """
+    routes = route_info_service.get_all_routes(db)
+    return routes
+
+@router.get("/rutas/{route_id}", response_model=RutaDetalleResponse)
+def get_transcaribe_route_by_id(route_id: int, db: Session = Depends(get_db)):
+    """
+    Obtiene los detalles de una ruta específica de Transcaribe por su ID.
+    """
+    route = route_info_service.get_route_by_id(db, route_id)
+    if not route:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Ruta con ID {route_id} no encontrada."
+        )
+    return route
