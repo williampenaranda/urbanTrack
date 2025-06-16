@@ -6,13 +6,8 @@ from app.models.models import UserRegister, UserLogin, UserUpdate
 from app.models.entities import Usuario # Importamos el modelo Usuario de entities
 from app.database import get_db
 from app.auth.utils import hash_password, verify_password # Funciones para hashing de contraseñas
-from app.services.route_calculation import calcular_trayecto_usuario
-from app.models.models import (
-    # ... tus otros esquemas
-    CalculateRouteRequest,
-    CalculateRouteResponse # <--- Asegúrate de importar esta nueva definición
-)
-
+from app.core.security import create_access_token, ACCESS_TOKEN_EXPIRE_MINUTES 
+from datetime import timedelta
 router = APIRouter()
 
 @router.post("/register", status_code=status.HTTP_201_CREATED) # Código de estado 201 para creación exitosa
@@ -65,33 +60,45 @@ def register(user_data: UserRegister, db: Session = Depends(get_db)):
 def login(credentials: UserLogin, db: Session = Depends(get_db)):
     """
     Autentica a un usuario.
-    Verifica las credenciales y devuelve información del usuario si son válidas.
+    Verifica las credenciales, genera un token JWT y devuelve información del usuario y el token.
     """
-    # Buscamos al usuario por su nombre de usuario
+    # 1. Buscar al usuario por su nombre de usuario
     user = db.query(Usuario).filter(Usuario.username == credentials.username).first()
     print(f"Se recibió una solicitud de login para: {credentials.username}")
 
-    # Verificamos si el usuario existe y si la contraseña es correcta
+    # 2. Verificar si el usuario existe y si la contraseña es correcta
     if not user or not verify_password(credentials.password, user.password):
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, # 401 Unauthorized para credenciales inválidas
+            status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Nombre de usuario o contraseña incorrectos."
         )
     
-    # Si las credenciales son válidas, devolvemos la información del usuario
-    # No devolvemos la contraseña ni el hash por seguridad.
+    # 3. Si las credenciales son válidas, generar el token JWT
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    # El 'sub' (subject) del token es comúnmente el username.
+    # Es una buena práctica almacenar un identificador único y no sensible en el token.
+    access_token = create_access_token(
+        data={"sub": user.username}, expires_delta=access_token_expires
+    )
+
+    # 4. Devolver el token y la información del usuario al frontend
+    # Esto permite al frontend almacenar el token y usar la información del usuario
+    # para renderizar la HomePage u otras secciones personalizadas.
     return {
         "message": "Inicio de sesión exitoso.",
-        "user": {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "user": { # Información del usuario que el frontend puede usar
             "id": user.id,
             "username": user.username,
             "first_name": user.first_name,
             "last_name": user.last_name,
             "email": user.email,
-            # created_at puede ser útil para el frontend si lo necesitas
+            # Asegúrate de que user.created_at sea un objeto datetime para usar .isoformat()
             "created_at": user.created_at.isoformat() if user.created_at else None 
         }
     }
+
 
 
 

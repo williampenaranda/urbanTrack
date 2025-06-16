@@ -1,5 +1,7 @@
+# app/models/entities.py
+
 #Contiene los modelos especificos para uso de SLQAlchemy PostGIS
-from sqlalchemy import Column, Integer, String, Float, Boolean, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, String, Float, Boolean, DateTime, ForeignKey, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
@@ -64,7 +66,8 @@ class Usuario(Base):
     ubicacion_actual = relationship("UbicacionUsuario", back_populates="usuario", uselist=False)
     ruta_activa = relationship("UsuarioRutaActual", back_populates="usuario", uselist=False)
     rutas_tomadas = relationship("RutaUsuario", back_populates="usuario")
-
+    # Ya no se necesita la relación con irregularidades_reportadas aquí
+    votes = relationship("IrregularityVote", back_populates="user")
 
 
 class UbicacionUsuario(Base):
@@ -75,7 +78,9 @@ class UbicacionUsuario(Base):
     user_id = Column(Integer, ForeignKey('usuario.id'), primary_key=True)
     latitud = Column(Float, nullable=False)
     longitud = Column(Float, nullable=False)
-    ultima_actualizacion = Column(Geometry(geometry_type='POINT', srid=4326), unique=True, nullable=False)
+    # Cambiado a Geometry para ser consistente con otras ubicaciones espaciales si es necesario
+    ubicacion_punto = Column(Geometry(geometry_type='POINT', srid=4326), nullable=False) 
+    ultima_actualizacion = Column(DateTime, default=func.now(), onupdate=func.now())
 
     usuario = relationship("Usuario", back_populates="ubicacion_actual")
 
@@ -103,9 +108,7 @@ class UbicacionTemporal(Base):
     __tablename__ = 'ubicacion_temporal'
     idbus = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     idruta = Column(Integer, ForeignKey('ruta.id'), nullable=False)
-    # Aquí también podemos usar Geometry si el cálculo del bus virtual devuelve un punto.
-    # Por ahora, para consistencia con el cálculo promedio (lat/lon), lo mantengo como Float,
-    # pero se podría convertir a Point al guardar.
+    # Se mantiene como Float por ahora, pero se puede considerar Geometry si la lógica lo requiere.
     latitud = Column(Float, nullable=False)
     longitud = Column(Float, nullable=False)
     velocidad = Column(Float, default=0.0)
@@ -131,3 +134,43 @@ class UsuarioRutaActual(Base):
     usuario = relationship("Usuario", back_populates="ruta_activa")
     ruta_seleccionada = relationship("Ruta")
     proxima_parada = relationship("Parada")
+
+
+##Tablas para Reporte de Irregularidades y Votos
+
+
+class ReportedIrregularity(Base):
+    __tablename__ = "reported_irregularities"
+    id = Column(Integer, primary_key=True, index=True)
+    titulo = Column(String, index=True, nullable=False)
+    descripcion = Column(String, nullable=True)
+    
+    # Campo de ubicación para datos geográficos
+    # 'POINT' indica que almacenará puntos, srid=4326 es el estándar GPS (WGS 84)
+    ubicacion = Column(Geometry('POINT', srid=4326), nullable=False) 
+    
+    activa = Column(Boolean, default=True) # Por defecto, la irregularidad está activa
+    
+    # Fecha y hora de creación, establecida automáticamente por la base de datos
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    
+    ultimo_like_at = Column(DateTime(timezone=True), nullable=True) # Última vez que se le dio 'like' (opcional)
+    likes = Column(Integer, default=0) # Contador de likes, por defecto 0
+    dislikes = Column(Integer, default=0) # Contador de dislikes, por defecto 0
+
+    # Relación con IrregularityVote
+    votes = relationship("IrregularityVote", back_populates="irregularity")
+
+class IrregularityVote(Base):
+    __tablename__ = "irregularity_votes"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("usuario.id"), nullable=False)
+    irregularity_id = Column(Integer, ForeignKey("reported_irregularities.id"), nullable=False)
+    
+    # True para like, False para dislike
+    is_like = Column(Boolean, nullable=False) 
+    
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+
+    user = relationship("Usuario", back_populates="votes")
+    irregularity = relationship("ReportedIrregularity", back_populates="votes")

@@ -19,6 +19,9 @@ from app.rutas.bus_routes import router as bus_router
 # Importación de la función de tu tarea de fondo
 from app.services.bus_tracking import run_bus_tracking_periodically
 
+#Importacion de la funcion de registrar irregularidades
+from app.irregularities.routes import router as irregularities_router
+
 
 # --- Manejo del ciclo de vida de la aplicación (Startup/Shutdown) con lifespan ---
 @asynccontextmanager
@@ -58,6 +61,7 @@ app = FastAPI(
 
 app.include_router(auth_routes.router, prefix="/api/auth", tags=["Autenticación"])
 app.include_router(bus_router, prefix="/api/bus", tags=["Buses y Rutas"])
+app.include_router(irregularities_router, prefix="/api/irregularities", tags=["Irregularidades"])
 
 @app.get("/api/health")
 async def health_check():

@@ -1,6 +1,6 @@
 # app/models/models.py (Este archivo contendrá tus esquemas Pydantic)
 
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, computed_field
 from datetime import datetime
 from typing import Optional, List # Asegúrate de importar List para listas en Pydantic
 
@@ -8,6 +8,7 @@ from typing import Optional, List # Asegúrate de importar List para listas en P
 from geoalchemy2.shape import to_shape
 from geoalchemy2 import Geometry
 from shapely.geometry import Point
+from app.models.custom_types import PointInResponse
 
 # --- Esquemas de Autenticación y Gestión de Usuarios ---
 
@@ -104,8 +105,9 @@ class BusLocationResponse(BaseModel):
     estado: str
     ultima_actualizacion: Optional[datetime] # Puede ser None si no hay fecha
 
-
+# ============================================================================
 # --- Esquemas para las Paradas (usando UbicacionLatLon para la ubicación) ---
+# ============================================================================
 class ParadaBaseResponse(BaseModel): # Nombre base para evitar conflicto con ParadaSugeridaResponse
     id: int
     nombre: str
@@ -123,8 +125,10 @@ class ParadaSugeridaResponse(ParadaBaseResponse): # Hereda para incluir id, nomb
     distancia_origen_usuario_metros: Optional[float] = None
     distancia_destino_usuario_metros: Optional[float] = None
 
-
+# =========================================================================
 # --- Esquemas para las Rutas (para GET /rutas y GET /rutas/{id}) ---
+# =========================================================================
+
 class RutaParadaOrderResponse(BaseModel):
     """Representa la relación Ruta-Parada con los detalles de la parada."""
     parada_id: int
@@ -147,9 +151,9 @@ class RutaDetailResponse(RutaBasicResponse): # Herencia para detalles completos 
     class Config:
         from_attributes = True
 
-
+# ================================================================================================
 # --- Esquemas para la Respuesta del Cálculo de Ruta (ajustados a tu estructura original) ---
-
+# ================================================================================================
 # Esquemas anidados para la respuesta de /calculate_route
 # Nombres de clase ajustados para mayor claridad y evitar duplicados con los de arriba
 
@@ -209,7 +213,7 @@ class RutaDetalleResponse(BaseModel):
     paradas: List[ParadaEnRutaResponse]
 
 # ================================================================
-# NUEVOS ESQUEMAS PARA LA RESPUESTA CONCISA DE CÁLCULO DE RUTA
+# ESQUEMAS PARA LA RESPUESTA CONCISA DE CÁLCULO DE RUTA
 # ================================================================
 
 class SimplifiedParadaResponse(BaseModel):
@@ -225,3 +229,50 @@ class SimplifiedCalculatedRouteResponse(BaseModel):
     distancia_origen_primera_parada_metros: float # Distancia a pie desde el origen del usuario a la primera parada de bus
     distancia_ultima_parada_destino_metros: float # Distancia a pie desde la última parada de bus al destino del usuario
     paradas_trayecto: List[SimplifiedParadaResponse] # Lista de paradas de bus en el segmento de la ruta principal
+
+# ================================================================
+# Esquemas para reporte y respuesta de  irregularidades
+# ================================================================
+class IrregularityCreate(BaseModel):
+    titulo: str = Field(..., min_length=3, max_length=100)
+    descripcion: Optional[str] = Field(None, max_length=500)
+    latitud: float = Field(..., ge=-90, le=90) # Rango válido para latitud
+    longitud: float = Field(..., ge=-180, le=180) # Rango válido para longitud
+
+    class Config:
+        json_schema_extra = { # Usar json_schema_extra para Pydantic V2
+            "example": {
+                "titulo": "Bache en calle principal",
+                "descripcion": "Agujero profundo cerca de la rotonda sur.",
+                "latitud": 10.4071,
+                "longitud": -75.5097
+            }
+        }
+
+class IrregularityResponse(BaseModel):
+    id: int
+    titulo: str
+    descripcion: Optional[str] = None # Es Optional en el ORM, así que aquí también.
+    activa: bool
+    created_at: datetime
+    ultimo_like_at: Optional[datetime] = None
+    likes: int
+    dislikes: int
+    ubicacion: PointInResponse
+
+    class Config:
+        from_attributes = True # Crucial para que Pydantic pueda leer desde instancias ORM
+        arbitrary_types_allowed = True # Permite que Pydantic maneje tipos no estándar como shapely.geometry.Point
+        # json_schema_extra = { ... } si quieres ejemplos en la respuesta
+        
+# --- Modelos de Votos ---
+
+class IrregularityVoteResponse(BaseModel):
+    id: int
+    user_id: int
+    irregularity_id: int
+    is_like: bool
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
