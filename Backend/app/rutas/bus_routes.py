@@ -4,7 +4,7 @@ from app.database import get_db
 from app.models.entities import RutaUsuario, UbicacionUsuario, UbicacionTemporal, Ruta, UsuarioRutaActual, Parada
 from app.services.bus_tracking import _get_or_create_ubicacion_usuario, check_user_location_status, run_bus_tracking_periodically
 from app.services.route_calculation import calcular_trayecto_usuario
-
+from app.models.models import SimplifiedCalculatedRouteResponse
 # --- NUEVA IMPORTACIÓN PARA INFORMACIÓN DE RUTAS ---
 from app.services import route_info_service 
 
@@ -27,10 +27,7 @@ from app.models.models import (
     RutaDetalleResponse # Modelo para detalles completos de una ruta
 )
 
-router = APIRouter(
-    prefix="/api/bus", # Añadimos un prefijo base para todos los endpoints de bus
-    tags=["Bus Routes & Tracking"] # Etiqueta para agrupar en la documentación de Swagger
-)
+router = APIRouter()
 
 # --- Configuración para la tarea de fondo de cálculo de buses (Recordatorio) ---
 # Este bloque no va en este archivo, sino en tu `main.py` de FastAPI.
@@ -170,13 +167,18 @@ def set_next_stop_for_user(request: SetNextStopRequest, db: Session = Depends(ge
     return {"message": f"Próxima parada {request.parada_id} establecida para el usuario {request.user_id}"}
 
 # --- ENDPOINT para calcular la ruta ---
-@router.post("/rutas/calculate_route", status_code=status.HTTP_200_OK, response_model=CalculateRouteResponse)
-def calculate_user_route(request: CalculateRouteRequest, db: Session = Depends(get_db)):
+@router.post(
+    "/calculate_route",
+    status_code=status.HTTP_200_OK,
+    # ¡LA CORRECCIÓN ESTÁ AQUÍ! Cambia CalculateRouteResponse por SimplifiedCalculatedRouteResponse
+    response_model=SimplifiedCalculatedRouteResponse 
+)
+async def calculate_user_route(request: CalculateRouteRequest, db: Session = Depends(get_db)):
     """
     Calcula el trayecto más adecuado para el usuario entre dos puntos geográficos.
     """
     try:
-        suggested_route = calcular_trayecto_usuario(
+        suggested_route = await calcular_trayecto_usuario(
             db,
             request.origen_lat,
             request.origen_lon,

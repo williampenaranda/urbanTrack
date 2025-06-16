@@ -22,7 +22,7 @@ class UserRegister(BaseModel):
 # Esquema para el inicio de sesión de usuarios
 class UserLogin(BaseModel):
     username: str
-    password: str   
+    password: str    
 
 # Esquema para la actualización de datos de usuario (sin password aquí)
 class UserUpdate(BaseModel):
@@ -184,6 +184,8 @@ class CalculateRouteResponse(BaseModel): # Tu esquema de respuesta final para /c
     parada_origen_sugerida: Optional[ParadaSugeridaResponse] = None
     parada_destino_sugerida: Optional[ParadaSugeridaResponse] = None
 
+# La UbicacionResponse que estaba al final se mantiene, pero UbicacionLatLon es más robusta
+# con el método from_geometry. Considera usar UbicacionLatLon consistentemente.
 class UbicacionResponse(BaseModel):
     latitude: float
     longitude: float
@@ -192,10 +194,34 @@ class ParadaEnRutaResponse(BaseModel):
     id: int
     nombre: str
     codigo: Optional[str] = None
-    ubicacion: Optional[UbicacionResponse] = None
+    ubicacion: Optional[UbicacionResponse] = None # Usa UbicacionLatLon aquí para consistencia
     orden_en_ruta: int
+
+    # Este json_encoder es importante si `ubicacion` es un objeto Geometry de SQLAlchemy/GeoAlchemy2
+    class Config:
+        json_encoders = {
+            Geometry: lambda v: UbicacionLatLon.from_geometry(v).dict() if v else None
+        }
 
 class RutaDetalleResponse(BaseModel):
     id: int
     nombre: str
     paradas: List[ParadaEnRutaResponse]
+
+# ================================================================
+# NUEVOS ESQUEMAS PARA LA RESPUESTA CONCISA DE CÁLCULO DE RUTA
+# ================================================================
+
+class SimplifiedParadaResponse(BaseModel):
+    """Modelo simplificado para una parada en el trayecto calculado."""
+    nombre: str
+    ruta_nombre: str # Nombre de la ruta a la que pertenece esta parada
+    longitude: float
+    latitude: float
+
+class SimplifiedCalculatedRouteResponse(BaseModel):
+    """Modelo de respuesta conciso para el cálculo de ruta."""
+    tiempo_estimado_minutos: float # Tiempo total estimado en minutos (bus + caminata)
+    distancia_origen_primera_parada_metros: float # Distancia a pie desde el origen del usuario a la primera parada de bus
+    distancia_ultima_parada_destino_metros: float # Distancia a pie desde la última parada de bus al destino del usuario
+    paradas_trayecto: List[SimplifiedParadaResponse] # Lista de paradas de bus en el segmento de la ruta principal

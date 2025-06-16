@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import func, cast, and_ # Importa 'cast' y 'and_'
 from sqlalchemy.sql import alias
 # Importaciones necesarias para trabajar con geometrías en SQLAlchemy y PostGIS
@@ -7,6 +7,9 @@ from geoalchemy2.types import Geography
 from geoalchemy2.shape import to_shape # Para convertir de Geometry a Shapely Point
 
 from app.models.entities import Ruta, Parada, RutaParada
+# Importamos los modelos Pydantic necesarios para la nueva respuesta
+from app.models.models import SimplifiedCalculatedRouteResponse, SimplifiedParadaResponse # ASUMO que estos modelos existen aquí o se importarán
+
 from typing import List, Dict, Optional, Tuple
 import heapq # Para la cola de prioridad de Dijkstra
 from datetime import timedelta # Para manejar tiempos
@@ -15,6 +18,9 @@ from datetime import timedelta # Para manejar tiempos
 # --- Constantes de Configuración del Algoritmo ---
 DEFAULT_BUS_SPEED_KPH = 20 # Velocidad promedio del bus en km/h
 DEFAULT_BUS_SPEED_MPS = DEFAULT_BUS_SPEED_KPH * 1000 / 3600 # Convertir a metros por segundo
+
+WALKING_SPEED_KPH = 5 # Velocidad promedio al caminar en km/h
+WALKING_SPEED_MPS = WALKING_SPEED_KPH * 1000 / 3600 # Convertir a metros por segundo
 
 TRANSFER_PENALTY_MINUTES = 15 # Penalización por cada transbordo en minutos
 TRANSFER_PENALTY_SECONDS = TRANSFER_PENALTY_MINUTES * 60 # Convertir a segundos
@@ -82,7 +88,7 @@ def _build_transport_graph(db: Session) -> Dict[int, List[Dict]]:
 
         if from_parada_id not in graph:
             graph[from_parada_id] = []
-        if to_parada_id not in graph:
+        if to_parada_id not in graph: # Asegurarse de que el nodo de destino también esté en el grafo
             graph[to_parada_id] = [] 
 
         graph[from_parada_id].append({
@@ -100,7 +106,7 @@ def _build_transport_graph(db: Session) -> Dict[int, List[Dict]]:
     # 4. Añadir información para transbordos (no son "aristas" físicas, sino puntos de decisión)
     #    Solo necesitamos asegurarnos de que la parada exista en el grafo si múltiples rutas la atraviesan.
     rutas_paradas = db.query(RutaParada).all() 
-    paradas_con_rutas: Dict[int, List[int]] = {}
+    paradas_con_rutas: Dict[int, set[int]] = {} # Usar un set para rutas_en_parada
     for rp in rutas_paradas:
         if rp.parada_id not in paradas_con_rutas:
             paradas_con_rutas[rp.parada_id] = set()
@@ -123,7 +129,7 @@ def _dijkstra(graph: Dict[int, List[Dict]], start_node: int, end_node: int) -> O
     """
     distances = {node: float('inf') for node in graph}
     
-    # predecessors guarda (costo_total, nodo_previo, ruta_id_del_segmento_que_llego_a_actual_node)
+    # predecessors guarda (nodo_previo, ruta_id_del_segmento_que_llego_a_actual_node)
     predecessors: Dict[int, Tuple[Optional[int], Optional[int]]] = {node: (None, None) for node in graph}
     
     # Cola de prioridad: (costo_acumulado, nodo_actual, ruta_id_actual_del_pasajero)
@@ -153,6 +159,10 @@ def _dijkstra(graph: Dict[int, List[Dict]], start_node: int, end_node: int) -> O
             if current_passenger_route_id is not None and edge_ruta_id != current_passenger_route_id:
                 cost_to_neighbor += TRANSFER_PENALTY_SECONDS
 
+            # La condición para actualizar la distancia debe considerar el current_passenger_route_id
+            # para evitar ciclos o caminos subóptimos cuando la ruta de un nodo cambia
+            # Por simplicidad, si el costo es menor, actualizamos. Esto asume que el dijkstra
+            # encuentra el camino de menor costo en tiempo, incluyendo penalizaciones.
             if cost_to_neighbor < distances[neighbor]:
                 distances[neighbor] = cost_to_neighbor
                 predecessors[neighbor] = (current_node, edge_ruta_id)
@@ -166,30 +176,44 @@ def _dijkstra(graph: Dict[int, List[Dict]], start_node: int, end_node: int) -> O
     current = end_node
     # Mantener un registro de la ruta actual para el último segmento insertado
     # para detectar correctamente el transbordo al principio del siguiente.
+    # Inicialmente es None, para que el primer segmento no aplique penalización de transbordo.
     last_segment_ruta_id = None 
 
+    # Esto reconstruye el camino en orden inverso, luego se invierte al final
+    temp_path_segments = []
     while current != start_node:
         prev_node, segment_ruta_id = predecessors[current]
         
         if prev_node is None: # Se llegó al nodo de inicio o hay un problema
             break
 
-        # Determinar si este segmento representa un transbordo (cambio de ruta)
-        # Esto ocurre si la ruta del segmento actual es diferente a la ruta del segmento anterior
-        # (si existe) O si es el primer segmento del camino (no hay ruta anterior)
-        transfer_occurred_here = False
+        # Calcular el costo real de este segmento (sin la penalización de transbordo que se aplicó al *llegar* a 'current')
+        # Si 'current_node' fue alcanzado desde 'prev_node' con una penalización de transbordo,
+        # esa penalización ya está incluida en distances[current].
+        # El costo del *segmento de bus* en sí es el costo del borde.
+        # Para obtener el costo de este segmento de bus, podemos buscarlo en el grafo.
+        actual_segment_cost = 0
+        for edge in graph.get(prev_node, []):
+            if edge["neighbor"] == current and edge["ruta_id"] == segment_ruta_id:
+                actual_segment_cost = edge["cost"]
+                break
+
+        # Determinar si este segmento es el *resultado* de un transbordo (es decir, el viaje en bus empieza en una nueva ruta)
+        is_transfer_point = False
         if last_segment_ruta_id is not None and segment_ruta_id != last_segment_ruta_id:
-            transfer_occurred_here = True
-        
-        path.insert(0, {
+             is_transfer_point = True # Si la ruta del segmento actual es diferente a la del anterior
+
+        temp_path_segments.append({
             "from_parada_id": prev_node,
             "to_parada_id": current,
             "ruta_id": segment_ruta_id,
-            "is_transfer": transfer_occurred_here,
-            "cost_seconds": distances[current] - distances[prev_node] # El costo real de este segmento
+            "is_transfer_point": is_transfer_point, # Indica que aquí se realizó un cambio de ruta (antes de tomar este segmento)
+            "cost_seconds": actual_segment_cost # El costo real del viaje en bus de este segmento
         })
         last_segment_ruta_id = segment_ruta_id # Actualizar para la siguiente iteración
         current = prev_node
+    
+    path = temp_path_segments[::-1] # Invertir para obtener el orden correcto
 
     total_time_seconds = distances[end_node]
     return {"path_segments": path, "total_time_seconds": total_time_seconds}
@@ -197,17 +221,18 @@ def _dijkstra(graph: Dict[int, List[Dict]], start_node: int, end_node: int) -> O
 
 # --- Función Principal de Cálculo de Trayecto ---
 
-def calcular_trayecto_usuario(
+async def calcular_trayecto_usuario( # Hacemos la función asíncrona
     db: Session,
     origen_lat: float,
     origen_lon: float,
     destino_lat: float,
     destino_lon: float
-) -> Optional[Dict]:
+) -> Optional[SimplifiedCalculatedRouteResponse]: # Modificamos el tipo de retorno
     """
     Calcula el trayecto más eficiente (en tiempo) para el usuario
     desde una ubicación de origen a una ubicación de destino,
-    priorizando rutas directas con penalización por transbordo.
+    priorizando rutas directas con penalización por transbordo,
+    y retorna la información en un formato simplificado.
     """
     
     # 1. Identificar la parada de origen más cercana de forma eficiente
@@ -225,7 +250,8 @@ def calcular_trayecto_usuario(
     ).first()
 
     if not parada_origen_cercana_result:
-        return {"message": "No se encontró una parada de origen suficientemente cercana (Max 300m).", "ruta_sugerida": None}
+        # Retorna None, el endpoint manejara la HTTPException
+        return None 
     
     parada_origen_cercana, min_dist_origen = parada_origen_cercana_result
 
@@ -244,164 +270,96 @@ def calcular_trayecto_usuario(
     ).first()
     
     if not parada_destino_cercana_result:
-        return {"message": "No se encontró una parada de destino suficientemente cercana (Max 300m).", "ruta_sugerida": None}
+        # Retorna None, el endpoint manejara la HTTPException
+        return None 
     
     parada_destino_cercana, min_dist_destino = parada_destino_cercana_result
 
-    print(f"Parada de origen más cercana: {parada_origen_cercana.nombre} (ID: {parada_origen_cercana.id}) a {min_dist_origen:.2f}m")
-    print(f"Parada de destino más cercana: {parada_destino_cercana.nombre} (ID: {parada_destino_cercana.id}) a {min_dist_destino:.2f}m")
-
-    # 3. Construir el grafo de transporte (AHORA MUCHO MÁS EFICIENTE)
+    # 3. Construir el grafo de transporte
     graph = _build_transport_graph(db)
 
     # Asegurarse de que las paradas de origen y destino existan en el grafo
-    # Esto es importante si una parada no tiene segmentos de ruta salientes/entrantes definidos,
-    # pero sí puede ser un punto de transbordo (ej. una parada final/inicial de una ruta)
     if parada_origen_cercana.id not in graph or parada_destino_cercana.id not in graph:
-        return {
-            "message": "Una o ambas paradas (origen/destino) no están conectadas en el grafo de rutas. Asegúrese que las rutas tienen al menos 2 paradas o son puntos de transbordo.",
-            "ruta_sugerida": None,
-            "parada_origen_sugerida": {
-                "id": parada_origen_cercana.id,
-                "nombre": parada_origen_cercana.nombre,
-                "distancia_origen_usuario_metros": min_dist_origen
-            },
-            "parada_destino_sugerida": {
-                "id": parada_destino_cercana.id,
-                "nombre": parada_destino_cercana.nombre,
-                "distancia_destino_usuario_metros": min_dist_destino
-            }
-        }
+        # Esto indica un problema de datos o que las paradas no son parte de rutas conectadas
+        return None 
 
     # 4. Ejecutar el algoritmo de Dijkstra
     dijkstra_result = _dijkstra(graph, parada_origen_cercana.id, parada_destino_cercana.id)
 
     if not dijkstra_result:
-        # Prepara los datos de las paradas sugeridas para la respuesta
-        parada_origen_sugerida_response = {
-            "id": parada_origen_cercana.id,
-            "nombre": parada_origen_cercana.nombre,
-            "ubicacion": {
-                "latitude": to_shape(parada_origen_cercana.ubicacion).y,
-                "longitude": to_shape(parada_origen_cercana.ubicacion).x
-            } if parada_origen_cercana.ubicacion else None,
-            "distancia_origen_usuario_metros": min_dist_origen
-        }
+        return None # No se encontró un camino viable en bus
 
-        parada_destino_sugerida_response = {
-            "id": parada_destino_cercana.id,
-            "nombre": parada_destino_cercana.nombre,
-            "ubicacion": {
-                "latitude": to_shape(parada_destino_cercana.ubicacion).y,
-                "longitude": to_shape(parada_destino_cercana.ubicacion).x
-            } if parada_destino_cercana.ubicacion else None,
-            "distancia_destino_usuario_metros": min_dist_destino
-        }
+    # 5. Calcular los componentes de la respuesta simplificada
+    
+    # Tiempo estimado total
+    total_bus_and_transfer_time_seconds = dijkstra_result["total_time_seconds"]
 
-        return {
-            "message": "No se encontró un camino entre las paradas de origen y destino sugeridas.",
-            "ruta_sugerida": None,
-            "parada_origen_sugerida": parada_origen_sugerida_response,
-            "parada_destino_sugerida": parada_destino_sugerida_response
-        }
+    # Tiempos de caminata
+    time_walking_origin_seconds = min_dist_origen / WALKING_SPEED_MPS if WALKING_SPEED_MPS > 0 else 0
+    time_walking_destination_seconds = min_dist_destino / WALKING_SPEED_MPS if WALKING_SPEED_MPS > 0 else 0
 
-    # 5. Formatear la salida del algoritmo de Dijkstra
+    total_estimated_time_seconds = total_bus_and_transfer_time_seconds + time_walking_origin_seconds + time_walking_destination_seconds
+    tiempo_estimado_minutos = round(total_estimated_time_seconds / 60, 2)
+
+    # Lista de paradas del trayecto
     path_segments = dijkstra_result["path_segments"]
-    total_time_seconds = dijkstra_result["total_time_seconds"]
-
-    # Reconstruir la ruta sugerida en un formato legible
-    ruta_reconstruida = []
     
-    # Para obtener el nombre de la ruta y de las paradas
+    # Necesitamos cargar los nombres de las rutas y paradas
     rutas_map = {r.id: r.nombre for r in db.query(Ruta).all()}
-    paradas_map = {p.id: p.nombre for p in db.query(Parada).all()}
-    paradas_ubicacion_map = {p.id: to_shape(p.ubicacion) for p in db.query(Parada).all()}
-
-    # Guardar la ruta_id del segmento anterior para detectar transbordos
-    previous_segment_ruta_id = None
-
-    for i, segment in enumerate(path_segments):
-        from_parada_id = segment["from_parada_id"]
-        to_parada_id = segment["to_parada_id"]
-        segment_ruta_id = segment["ruta_id"]
-        cost_seconds = segment["cost_seconds"] 
-
-        # Determinar si hay transbordo en este punto
-        is_transfer_segment = False
-        if previous_segment_ruta_id is not None and segment_ruta_id != previous_segment_ruta_id:
-            is_transfer_segment = True
-            # Añadir el segmento de transbordo explícito
-            ruta_reconstruida.append({
-                "tipo": "TRANSBORDO",
-                "ruta_id": None, # No hay ruta específica para el segmento de transbordo
-                "ruta_nombre": None,
-                "desde_parada_id": from_parada_id,
-                "desde_parada_nombre": paradas_map.get(from_parada_id, "Desconocida"),
-                "desde_parada_ubicacion": {
-                    "latitude": paradas_ubicacion_map.get(from_parada_id).y,
-                    "longitude": paradas_ubicacion_map.get(from_parada_id).x
-                } if paradas_ubicacion_map.get(from_parada_id) else None,
-                "hasta_parada_id": from_parada_id, # La parada donde ocurre el transbordo
-                "hasta_parada_nombre": paradas_map.get(from_parada_id, "Desconocida"),
-                "hasta_parada_ubicacion": {
-                    "latitude": paradas_ubicacion_map.get(from_parada_id).y,
-                    "longitude": paradas_ubicacion_map.get(from_parada_id).x
-                } if paradas_ubicacion_map.get(from_parada_id) else None,
-                "costo_segundos": TRANSFER_PENALTY_SECONDS,
-                "descripcion": f"Cambia de ruta en {paradas_map.get(from_parada_id, 'Desconocida')} (Penalización de {TRANSFER_PENALTY_MINUTES} min)",
-                "hacia_ruta": rutas_map.get(segment_ruta_id, "Desconocida") # La ruta a la que se transborda
-            })
-        
-        # Añadir el segmento de viaje en bus
-        ruta_reconstruida.append({
-            "tipo": "VIAJE_EN_BUS",
-            "ruta_id": segment_ruta_id,
-            "ruta_nombre": rutas_map.get(segment_ruta_id, "Desconocida"),
-            "desde_parada_id": from_parada_id,
-            "desde_parada_nombre": paradas_map.get(from_parada_id, "Desconocida"),
-            "desde_parada_ubicacion": {
-                "latitude": paradas_ubicacion_map.get(from_parada_id).y,
-                "longitude": paradas_ubicacion_map.get(from_parada_id).x
-            } if paradas_ubicacion_map.get(from_parada_id) else None,
-            "hasta_parada_id": to_parada_id,
-            "hasta_parada_nombre": paradas_map.get(to_parada_id, "Desconocida"),
-            "hasta_parada_ubicacion": {
-                "latitude": paradas_ubicacion_map.get(to_parada_id).y,
-                "longitude": paradas_ubicacion_map.get(to_parada_id).x
-            } if paradas_ubicacion_map.get(to_parada_id) else None,
-            "costo_segundos": cost_seconds,
-            "descripcion": f"Toma Ruta '{rutas_map.get(segment_ruta_id, 'Desconocida')}' de '{paradas_map.get(from_parada_id, 'Desconocida')}' a '{paradas_map.get(to_parada_id, 'Desconocida')}'"
-        })
-        previous_segment_ruta_id = segment_ruta_id
+    paradas_map = {p.id: p for p in db.query(Parada).all()} # Mapear por ID para acceso rápido
     
-    # Prepara los datos de las paradas sugeridas para la respuesta (ahora que las tenemos del query optimizado)
-    parada_origen_sugerida_response = {
-        "id": parada_origen_cercana.id,
-        "nombre": parada_origen_cercana.nombre,
-        "ubicacion": {
-            "latitude": to_shape(parada_origen_cercana.ubicacion).y,
-            "longitude": to_shape(parada_origen_cercana.ubicacion).x
-        } if parada_origen_cercana.ubicacion else None,
-        "distancia_origen_usuario_metros": min_dist_origen
-    }
+    paradas_trayecto_data: List[SimplifiedParadaResponse] = []
+    
+    # Añadir la parada de embarque (la primera parada del trayecto en bus)
+    if path_segments:
+        first_segment = path_segments[0]
+        first_bus_stop_id = first_segment["from_parada_id"]
+        first_bus_ruta_id = first_segment["ruta_id"] # La ruta del primer segmento
+        first_parada_obj = paradas_map.get(first_bus_stop_id)
+        if first_parada_obj:
+            paradas_trayecto_data.append(
+                SimplifiedParadaResponse(
+                    nombre=first_parada_obj.nombre,
+                    ruta_nombre=rutas_map.get(first_bus_ruta_id, "N/A"), # La ruta asociada a esta parada en el trayecto
+                    longitude=to_shape(first_parada_obj.ubicacion).x,
+                    latitude=to_shape(first_parada_obj.ubicacion).y
+                )
+            )
 
-    parada_destino_sugerida_response = {
-        "id": parada_destino_cercana.id,
-        "nombre": parada_destino_cercana.nombre,
-        "ubicacion": {
-            "latitude": to_shape(parada_destino_cercana.ubicacion).y,
-            "longitude": to_shape(parada_destino_cercana.ubicacion).x
-        } if parada_destino_cercana.ubicacion else None,
-        "distancia_destino_usuario_metros": min_dist_destino
-    }
+        # Iterar sobre los segmentos para añadir el resto de paradas
+        for segment in path_segments:
+            # Añadir la parada 'to_parada_id' de cada segmento
+            # Esto automáticamente incluye la parada de transbordo y la parada final
+            current_parada_id = segment["to_parada_id"]
+            current_ruta_id = segment["ruta_id"]
+            current_parada_obj = paradas_map.get(current_parada_id)
 
-    return {
-        "message": "Ruta más eficiente encontrada.",
-        "ruta_sugerida": {
-            "parada_origen_sugerida": parada_origen_sugerida_response,
-            "parada_destino_sugerida": parada_destino_sugerida_response,
-            "total_tiempo_estimado_segundos": total_time_seconds,
-            "total_tiempo_estimado_formato": str(timedelta(seconds=int(total_time_seconds))),
-            "segmentos_trayecto": ruta_reconstruida
-        }
-    }
+            if current_parada_obj:
+                paradas_trayecto_data.append(
+                    SimplifiedParadaResponse(
+                        nombre=current_parada_obj.nombre,
+                        ruta_nombre=rutas_map.get(current_ruta_id, "N/A"),
+                        longitude=to_shape(current_parada_obj.ubicacion).x,
+                        latitude=to_shape(current_parada_obj.ubicacion).y
+                    )
+                )
+
+    # Eliminar duplicados si hay (ej. si la misma parada es el fin de un segmento y el inicio de otro)
+    # Convertir a tuplas para que sean 'hashable' y luego de vuelta a lista de objetos
+    unique_paradas_tuples = []
+    seen_coords = set()
+    for parada in paradas_trayecto_data:
+        coords_tuple = (parada.latitude, parada.longitude)
+        if coords_tuple not in seen_coords:
+            unique_paradas_tuples.append(parada)
+            seen_coords.add(coords_tuple)
+    paradas_trayecto_data = unique_paradas_tuples
+
+
+    # Retornar el resultado en el formato Pydantic simplificado
+    return SimplifiedCalculatedRouteResponse(
+        tiempo_estimado_minutos=tiempo_estimado_minutos,
+        distancia_origen_primera_parada_metros=round(min_dist_origen, 2),
+        distancia_ultima_parada_destino_metros=round(min_dist_destino, 2),
+        paradas_trayecto=paradas_trayecto_data
+    )

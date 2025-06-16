@@ -8,7 +8,6 @@ from contextlib import asynccontextmanager
 # Importaciones de tu configuración de base de datos
 from app.database import Base, engine, get_db
 
-# --- ¡¡¡ESTA LÍNEA ES CRÍTICA Y DEBE ESTAR AQUÍ, ARRIBA DE FastAPI INSTANCE!!! ---
 # Asegura que todos los modelos definidos en entities.py sean conocidos por SQLAlchemy
 # antes de que Base.metadata.create_all() sea llamado en el lifespan.
 import app.models.entities 
