@@ -116,14 +116,14 @@ async def like_irregularity(
     ).first()
 
     if existing_vote:
-        if existing_vote.tipo_voto == 'like':
+        if existing_vote.is_like:
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
                 detail="Ya has dado 'Me gusta' a esta irregularidad."
             )
         else: # Si ya dio dislike, cambia a like
-            existing_vote.tipo_voto = 'like'
-            existing_vote.fecha_voto = func.now()
+            existing_vote.is_like = True # <-- ¡CAMBIO IMPORTANTE AQUÍ!
+            existing_vote.created_at = func.now()
             irregularity.dislikes -= 1 # Reduce el dislike
             irregularity.likes += 1    # Incrementa el like
             irregularity.ultimo_like_at = datetime.now() # Actualiza el tiempo del último like
@@ -187,20 +187,20 @@ async def dislike_irregularity(
     ).first()
 
     if existing_vote:
-        if existing_vote.tipo_voto == 'dislike':
+        if not existing_vote.is_like:
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
                 detail="Ya has dado 'No me gusta' a esta irregularidad."
             )
         else: # Si ya dio like, cambia a dislike
-            existing_vote.tipo_voto = 'dislike'
-            existing_vote.fecha_voto = func.now()
+            existing_vote.is_like = False # <-- ¡CAMBIO IMPORTANTE AQUÍ!
+            existing_vote.created_at = func.now()
             irregularity.likes -= 1    # Reduce el like
             irregularity.dislikes += 1 # Incrementa el dislike
             # NOTA: No se actualiza 'ultimo_like_at' al dar dislike.
             db.add(existing_vote)
             db.add(irregularity)
-            db.commit()
+            db.commit() 
             db.refresh(existing_vote)
             return existing_vote
 
