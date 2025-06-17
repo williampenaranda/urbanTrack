@@ -2,12 +2,13 @@
 from fastapi import APIRouter, Depends, HTTPException, status # Importamos 'status' para códigos HTTP más claros
 from sqlalchemy.orm import Session
 # Asegúrate de que 'app.models.models' contenga tus modelos Pydantic (UserRegister, UserLogin, UserUpdate)
-from app.models.models import UserRegister, UserLogin, UserUpdate
+from app.models.models import UserRegister, UserLogin, UserUpdate, UserResponse
 from app.models.entities import Usuario # Importamos el modelo Usuario de entities
 from app.database import get_db
 from app.auth.utils import hash_password, verify_password # Funciones para hashing de contraseñas
 from app.core.security import create_access_token, ACCESS_TOKEN_EXPIRE_MINUTES 
 from datetime import timedelta
+from app.auth.dependencies import get_current_user
 router = APIRouter()
 
 @router.post("/register", status_code=status.HTTP_201_CREATED) # Código de estado 201 para creación exitosa
@@ -160,3 +161,25 @@ def update_user(user_id: int, updated_user_data: UserUpdate, db: Session = Depen
             detail=f"Error inesperado al actualizar el perfil: {e}"
         )
 
+@router.get(
+    "/me",
+    response_model=UserResponse, # <-- Aquí se usa tu modelo UserResponse
+    summary="Obtener información del usuario autenticado",
+    description="Devuelve los detalles del usuario actualmente autenticado basado en el token JWT proporcionado."
+)
+async def read_current_user(
+    current_user: Usuario = Depends(get_current_user) # La dependencia te inyecta el objeto DBUser
+):
+    """
+    Retorna el objeto Usuario del usuario autenticado.
+    FastAPI mapeará automáticamente el objeto DBUser a tu UserResponse model,
+    asumiendo que los nombres de los atributos coinciden.
+    """
+    # FastAPI/Pydantic con from_attributes=True se encargará de mapear:
+    # current_user.username -> UserResponse.username
+    # current_user.first_name -> UserResponse.first_name
+    # current_user.last_name -> UserResponse.last_name
+    # current_user.email -> UserResponse.email
+    # current_user.created_at -> UserResponse.created_at
+    # current_user.id -> UserResponse.id
+    return current_user
